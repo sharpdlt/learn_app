@@ -10,7 +10,7 @@ class MainConfig(AppConfig):
     verbose_name = 'Авторизация'
 
     def ready(self):
-        import main.signals
+        from . import signals
 
 
 user_registered = Signal()
