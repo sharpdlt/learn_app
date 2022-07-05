@@ -56,6 +56,7 @@ class Subject(models.Model):
 class Track(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.PROTECT)
     track_name = models.CharField(max_length=255)
+    position = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self) -> str:
         return f'{self.track_name} - {self.subject.subject_name}'
@@ -70,6 +71,7 @@ class Topic(models.Model):
     topic_name = models.CharField(max_length=255)
     content = models.TextField()
     duration = models.IntegerField()
+    position = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self) -> str:
         return f'{self.topic_name} - {self.track.track_name}'

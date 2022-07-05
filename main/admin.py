@@ -1,5 +1,6 @@
 import datetime
 from django.contrib import admin
+import nested_admin
 
 from .models import Course, Subject, Group, Topic, Track
 from .models import Profile, Role, Teacher, Student
@@ -57,19 +58,20 @@ class ProfileAdmin(admin.ModelAdmin):
     actions = [send_activation_notifications, ]
 
 
-class TrackInline(admin.StackedInline):
-    model = Track
-
-
-class TopicInline(admin.StackedInline):
+class TopicInline(nested_admin.NestedStackedInline):
     model = Topic
+    sortable_field_name = "position"
+    extra = 1
 
 
-class TrackAdmin(admin.ModelAdmin):
+class TrackInline(nested_admin.NestedStackedInline):
+    model = Track
+    sortable_field_name = "position"
     inlines = [TopicInline, ]
+    extra = 1
 
 
-class SubjectAdmin(admin.ModelAdmin):
+class SubjectAdmin(nested_admin.NestedModelAdmin):
     inlines = [TrackInline, ]
 
 
@@ -80,5 +82,3 @@ admin.site.register(Role)
 admin.site.register(Group)
 admin.site.register(Course)
 admin.site.register(Subject, SubjectAdmin)
-admin.site.register(Track, TrackAdmin)
-# admin.site.register(Topic)
