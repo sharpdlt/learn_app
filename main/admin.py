@@ -1,7 +1,7 @@
 import datetime
 from django.contrib import admin
 
-from .models import Course, Subject, Group, Topic, Header
+from .models import Course, Subject, Group, Topic, Track
 from .models import Profile, Role, Teacher, Student
 from .utilities import send_activation_notification
 
@@ -16,14 +16,14 @@ def send_activation_notifications(modeladmin, request, queryset):
 send_activation_notifications.short_description = 'Отправка писем с требованиями активации'
 
 
-class NonactivatedFilter(admin.SimpleListFilter):
+class NonActivatedFilter(admin.SimpleListFilter):
     title = 'Прошли активацию?'
     parameter_name = 'actstate'
 
     def lookups(self, request, model_admin):
         return (
             ('activated', 'Прошли'),
-            ('threedays', 'Не прошли более 3 дней'),
+            ('three_days', 'Не прошли более 3 дней'),
             ('week', 'Не прошли более недели'),
         )
 
@@ -31,7 +31,7 @@ class NonactivatedFilter(admin.SimpleListFilter):
         val = self.value()
         if val == 'activated':
             return queryset.filter(is_active=True, is_activated=True)
-        elif val == 'threedays':
+        elif val == 'three_days':
             d = datetime.date.today() - datetime.timedelta(days=3)
             return queryset.filter(is_active=False, is_activated=False, date_joined__date__lt=d)
         elif val == 'week':
@@ -42,7 +42,7 @@ class NonactivatedFilter(admin.SimpleListFilter):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'is_activated', 'date_joined')
     search_fields = ('username', 'email', 'first_name', 'last_name')
-    list_filter = (NonactivatedFilter,)
+    list_filter = (NonActivatedFilter,)
     fields = (
         ('first_name', 'last_name'),
         ('username', 'email'),
@@ -53,7 +53,24 @@ class ProfileAdmin(admin.ModelAdmin):
         'resume_addr', 'portfolio_addr', 'image',
     )
     readonly_fields = ('last_login', 'date_joined',)
+
     actions = [send_activation_notifications, ]
+
+
+class TrackInline(admin.StackedInline):
+    model = Track
+
+
+class TopicInline(admin.StackedInline):
+    model = Topic
+
+
+class TrackAdmin(admin.ModelAdmin):
+    inlines = [TopicInline, ]
+
+
+class SubjectAdmin(admin.ModelAdmin):
+    inlines = [TrackInline, ]
 
 
 admin.site.register(Profile, ProfileAdmin)
@@ -62,6 +79,6 @@ admin.site.register(Teacher)
 admin.site.register(Role)
 admin.site.register(Group)
 admin.site.register(Course)
-admin.site.register(Subject)
-admin.site.register(Header)
-admin.site.register(Topic)
+admin.site.register(Subject, SubjectAdmin)
+admin.site.register(Track, TrackAdmin)
+# admin.site.register(Topic)

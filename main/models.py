@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from .utilities import get_timestamp_path
-from .apps import user_registered
 
 from .apps import user_registered
 
@@ -37,8 +36,8 @@ class Group(models.Model):
         return f'{self.course.course_name} - {self.group_name}'
 
     class Meta:
-        verbose_name_plural = 'Группы'
         verbose_name = 'Группа'
+        verbose_name_plural = 'Группы'
 
 
 class Subject(models.Model):
@@ -54,12 +53,12 @@ class Subject(models.Model):
         verbose_name_plural = 'Предметы'
 
 
-class Header(models.Model):
+class Track(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.PROTECT)
-    header_name = models.CharField(max_length=255)
+    track_name = models.CharField(max_length=255)
 
     def __str__(self) -> str:
-        return f'{self.header_name} - {self.subject.subject_name}'
+        return f'{self.track_name} - {self.subject.subject_name}'
 
     class Meta:
         verbose_name = 'Глава'
@@ -67,13 +66,13 @@ class Header(models.Model):
 
 
 class Topic(models.Model):
-    header = models.ForeignKey(Header, on_delete=models.PROTECT)
+    track = models.ForeignKey(Track, on_delete=models.PROTECT)
     topic_name = models.CharField(max_length=255)
     content = models.TextField()
     duration = models.IntegerField()
 
     def __str__(self) -> str:
-        return f'{self.topic_name} - {self.header.header_name}'
+        return f'{self.topic_name} - {self.track.track_name}'
 
     class Meta:
         verbose_name = 'Тема'
